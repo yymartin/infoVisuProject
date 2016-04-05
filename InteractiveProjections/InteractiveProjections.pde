@@ -46,7 +46,7 @@ void draw() {
   float[][] transformRotX = rotateXMatrix(rotX);
   float[][] transformRotY = rotateYMatrix(rotY);
   float[][] transformScale = scaleMatrix(drag, drag, drag);
-  float[][] transform2 = translateMatrix(200, 200, 0);
+  float[][] transform2 = translateMatrix(400, 350, 0);
   
   
   input3DBox = transformBox(input3DBox, transformScale);
