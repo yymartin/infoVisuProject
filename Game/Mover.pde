@@ -14,7 +14,7 @@ void update(){
 gravityForce.x = -sin(dragZ) * gravityConstant;
 gravityForce.y = sin(dragX) * gravityConstant;
 float normalForce = 1;
-float mu = 0.01;
+float mu = 0.1;
 float frictionMagnitude = normalForce * mu;
 PVector friction = velocity.copy();
 friction.mult(-1);
@@ -30,8 +30,8 @@ location.add(velocity);
 void display(){
 pushMatrix();
 translate(mover.location.x,-diametre/2 - hauteur,mover.location.y);
-noStroke();
-fill(255,0,0);
+fill(255,153,153);
+stroke(255,51,51);
 sphere(diametre);
 popMatrix();
 }
@@ -61,13 +61,13 @@ void checkCylinderCollision()
   {
     float distance = dist(location.x, location.y, c.posX, c.posY);
     
-    PVector n = new PVector(c.posX - location.x, c.posY - location.y);
-    n = n.normalize();
-    
-    if (distance < diametre/2 + c.size)
+    if (distance < diametre + c.size)
     {
-      PVector v2 = velocity.sub((n.mult(velocity.dot(n))).mult(2));
-      velocity = v2.copy();
+      PVector n = new PVector(c.posX - location.x, c.posY - location.y);
+      n.normalize();
+      location.x = n.copy().mult(c.size + diametre).mult(-1).x + c.posX;
+      location.y = n.copy().mult(c.size + diametre).mult(-1).y + c.posY;
+      velocity.sub((n.mult(velocity.dot(n))).mult(2));
     }
   }
 }

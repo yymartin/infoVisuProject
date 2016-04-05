@@ -5,7 +5,7 @@ class Cylinder {
  PShape closeBottom;
  PShape closeTop;
  float size = 50;
- float cylinderHeight = 150;
+ float cylinderHeight = 50;
  int cylinderResolution = 40;
 
 Cylinder(float posX, float posY){
@@ -54,7 +54,7 @@ Cylinder(float posX, float posY){
     }
   closeBottom.endShape();
 }
-void draw() {
+void drawCylinder() {
   pushMatrix();
   translate(posX, -cylinderHeight, posY);
   rotateX(-PI/2);
