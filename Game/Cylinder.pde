@@ -4,7 +4,7 @@ class Cylinder {
  PShape openCylinder;
  PShape closeBottom;
  PShape closeTop;
- float size = 50;
+ float size = 25;
  float cylinderHeight = 50;
  int cylinderResolution = 40;
 

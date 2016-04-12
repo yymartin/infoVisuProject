@@ -29,7 +29,7 @@ location.add(velocity);
 
 void display(){
 pushMatrix();
-translate(mover.location.x,-diametre/2 - hauteur,mover.location.y);
+translate(mover.location.x,-diametre/2-15,mover.location.y);
 fill(255,153,153);
 stroke(255,51,51);
 sphere(diametre);
@@ -37,21 +37,29 @@ popMatrix();
 }
 
 void checkEdges() {
-if (location.x >= 250) {
+if (location.x >= largeur/2) {
 velocity.x *= -1;
-location.x = 250;
+location.x = largeur/2;
+updateScore(-velocity.mag());
+
 }
-else if (location.x <= -250) {
+else if (location.x <= -largeur/2) {
 velocity.x *= -1;
-location.x = -250;
+location.x = -largeur/2;
+updateScore(-velocity.mag());
+
 }
-if (location.y >= 250) {
+if (location.y >= largeur/2) {
 velocity.y *= -1;
-location.y = 250;
+location.y = largeur/2;
+updateScore(-velocity.mag());
+
 }
-else if (location.y <= -250) {
+else if (location.y <= -largeur/2) {
 velocity.y *= -1;
-location.y = -250;
+location.y = -largeur/2;
+updateScore(-velocity.mag());
+
 }
 }
 
@@ -68,7 +76,21 @@ void checkCylinderCollision()
       location.x = n.copy().mult(c.size + diametre).mult(-1).x + c.posX;
       location.y = n.copy().mult(c.size + diametre).mult(-1).y + c.posY;
       velocity.sub((n.mult(velocity.dot(n))).mult(2));
+      updateScore(velocity.mag());
     }
   }
+}
+
+void updateScore(float velocity){  
+   if(tabScore.size() > nbCol){
+      java.util.Collections.rotate(tabScore,-1);
+      tabScore.set(tabScore.size()-1,tabScore.get(tabScore.size()-2) + velocity);
+   } else {
+   tabScore.add(tabScore.get(tabScore.size()-1) + velocity);
+   }
+   if(tabScore.get(tabScore.size()-1) < 0){
+      tabScore.set(tabScore.size()-1,0.0); 
+   }
+   maxScore = max(maxScore, tabScore.get(tabScore.size()-1));
 }
 }
