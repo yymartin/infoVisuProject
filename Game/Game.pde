@@ -31,8 +31,9 @@ void settings() {
 
 void setup(){ 
  hs = new HScrollbar(80+2*topViewSize, windowHeight-40, 300, 20);
- tabScore.add(0.0);
- tabScore.add(0.0);
+ for (int i = 0; i < nbCol; i++) {
+   tabScore.add(0.0); 
+ }
  bottomRectangle = createGraphics(windowWidth, 200, P2D);
  topView = createGraphics(topViewSize,topViewSize, P2D);
  score = createGraphics(topViewSize+700, topViewSize+700, P2D);
@@ -70,10 +71,20 @@ void drawBarChart(){
  barChart.fill(255);
  barChart.stroke(0);
  barChart.rect(0,0,barChartWidth-1, topViewSize-51);
- for(int i = 0; i < tabScore.size(); i++){
-    barChart.fill(0);
-    barChart.stroke(255);
-    barChart.rect(i*barChartWidth/(nbCol*hs.getPos()),topViewSize-52,barChartWidth/(nbCol*hs.getPos()), -(6.0*tabScore.get(i))/(7.0*maxScore)*(topViewSize-51));    
+ int j = 0;
+ //for(int i = (int)(tabScore.size()-nbCol*hs.getPos()); i < tabScore.size(); i++){
+ //   barChart.fill(0);
+ //   barChart.stroke(255);
+ //   barChart.rect(j*barChartWidth/(nbCol*hs.getPos()),topViewSize-52,barChartWidth/(nbCol*hs.getPos()), -(6.0*tabScore.get(i))/(7.0*maxScore)*(topViewSize-51));  
+ //   j++;
+ //}
+ barChart.fill(0);
+ barChart.stroke(255);
+ float i = tabScore.size()-nbCol*hs.getPos();
+ while(i < tabScore.size()){
+   barChart.rect(j*barChartWidth/(nbCol*hs.getPos()),topViewSize-52,barChartWidth/(nbCol*hs.getPos())-2, -(6.0*tabScore.get((int)i))/(7.0*maxScore)*(topViewSize-51));  
+   j++;
+   i++;
  }
  barChart.endDraw();
 }

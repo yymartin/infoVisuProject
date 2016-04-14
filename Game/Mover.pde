@@ -82,12 +82,13 @@ void checkCylinderCollision()
 }
 
 void updateScore(float velocity){  
-   if(tabScore.size() > nbCol){
-      java.util.Collections.rotate(tabScore,-1);
+   //if(tabScore.size() > 150){
+     java.util.Collections.rotate(tabScore,-1);
+      //java.util.Collections.rotate(tabScore,-1);
       tabScore.set(tabScore.size()-1,tabScore.get(tabScore.size()-2) + velocity);
-   } else {
-   tabScore.add(tabScore.get(tabScore.size()-1) + velocity);
-   }
+   //} else {
+   //tabScore.add(tabScore.get(tabScore.size()-1) + velocity);
+   //}
    if(tabScore.get(tabScore.size()-1) < 0){
       tabScore.set(tabScore.size()-1,0.0); 
    }
