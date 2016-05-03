@@ -64,14 +64,14 @@ return min(max(val, minVal), maxVal);
 void display() {
 noStroke();
 fill(204);
-scroll.rect(0, 0, barWidth, barHeight);
+rect(0, yPosition, barWidth, barHeight);
 if (mouseOver || locked) {
 fill(0, 0, 0);
 }
 else {
 fill(102, 102, 102);
 }
-scroll.rect(sliderPosition-xPosition, 0, barHeight, barHeight);
+rect(sliderPosition-xPosition, yPosition, barHeight, barHeight);
 }
 /**
 * @brief Gets the slider position
@@ -80,6 +80,7 @@ scroll.rect(sliderPosition-xPosition, 0, barHeight, barHeight);
 * corresponding to [leftmost position, rightmost position]
 */
 float getPos() {
-return 0.1+0.9*(sliderPosition - xPosition)/(barWidth - barHeight);
+return (sliderPosition - xPosition)/(barWidth - barHeight);
 }
+
 }

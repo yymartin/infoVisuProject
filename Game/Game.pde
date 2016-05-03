@@ -80,11 +80,11 @@ void drawBarChart(){
  //}
  barChart.fill(0);
  barChart.stroke(255);
- float i = tabScore.size()-nbCol*hs.getPos();
- while(i < tabScore.size()){
-   barChart.rect(j*barChartWidth/(nbCol*hs.getPos()),topViewSize-52,barChartWidth/(nbCol*hs.getPos())-2, -(6.0*tabScore.get((int)i))/(7.0*maxScore)*(topViewSize-51));  
+ float i = tabScore.size()-1;
+ while(i >= tabScore.size()-nbCol*hs.getPos()-1){
+   barChart.rect(barChartWidth - j*barChartWidth/(nbCol*hs.getPos()),topViewSize-52, -(barChartWidth/(nbCol*hs.getPos())-2), -(6.0*tabScore.get((int)i))/(7.0*maxScore)*(topViewSize-51));  
    j++;
-   i++;
+   i--;
  }
  barChart.endDraw();
 }
