@@ -1,55 +1,87 @@
+import processing.video.*;
+
+Capture cam;
 PImage img, houghImg;
 HScrollbar hs1, hs2 ,hs3;
 
+int pWidth = 640;
+int pHeight = 480;
+
+float[][] kernel1 = { { 0, 0, 0 },
+                      { 0, 2, 0 },
+                      { 0, 0, 0 } };
+float[][] kernel2 = { { 0, 1, 0 },
+                      { 1, 0, 1 },
+                      { 0, 1, 0 } };
+float[][] gaussian = { { 9, 12, 9 },
+                       { 12, 15, 12 },
+                       { 9, 12, 9 } };
+                         
 void settings() {
-size(800, 600,P2D);
+  size(640, 480, P2D);
 }
+
 void setup() {
-img = loadImage("board1.jpg");
-PImage finalimg = sobel(img);
-hough(finalimg);
-hs1 = new HScrollbar(0, 600-35, 800, 35);
-hs2 = new HScrollbar(0, 600 - 90, 800, 35); 
-hs3 = new HScrollbar(0, 600 - 145, 800, 35);
-noLoop();
- }
+  
+  hs1 = new HScrollbar(0, pHeight-35, pWidth, 35);
+  hs2 = new HScrollbar(0, pHeight - 90, pWidth, 35); 
+  hs3 = new HScrollbar(0, pHeight - 145, pWidth, 35);
+  
+  String[] cameras = Capture.list();
+  if (cameras.length == 0) {
+    println("There are no cameras available for capture.");
+    exit();
+  } 
+  else {
+    println("Available cameras:");
+    for (int i = 0; i < cameras.length; i++) {
+      println(cameras[i]);
+    }
+    cam = new Capture(this, cameras[0]);
+    cam.start();
+  }
+  
+
+
+}
 
 void draw() {
-  float[][] kernel1 = { { 0, 0, 0 },
-                        { 0, 2, 0 },
-                        { 0, 0, 0 } };
-  float[][] kernel2 = { { 0, 1, 0 },
-                        { 1, 0, 1 },
-                        { 0, 1, 0 } };
-  float[][] gaussian = { { 9, 12, 9 },
-                         { 12, 15, 12 },
-                         { 9, 12, 9 } };
+  if (cam.available() == true) {
+    cam.read();
+  }
+  img = cam.get();
+  
+  PImage finalimg = sobel(img);
+  hough(finalimg);
+  image(img, 0, 0);
+  houghLinePlot(finalimg, 6);
+  getIntersections(candidatesAsVectors);
+  
 //image(filterBinary(img, true, 255*hs1.getPos()), 0, 0);
 //image(filterHue(img),0,0);
 //image(selectHue(img),0,0);
 //image(convolute(img,gaussian),0,0);
   //PImage finalimg = selectHue(img);
- // finalimg = convolute(finalimg,gaussian);
- // finalimg = filterBinary(finalimg, true, 255*hs3.getPos());
+//  finalimg = convolute(finalimg,gaussian);
+//  finalimg = filterBinary(finalimg, true, 255*hs3.getPos());
  // finalimg = convolute(finalimg,gaussian);
   //image(finalimg,0,0);
-  //image(finalimg,0,0);
- houghDisplay();
- image(houghImg,0,0);
-// drawScrollBar();
+//  image(finalimg,0,0);
+ //houghDisplay();
+ //drawScrollBar();
 }
 
-void drawScrollBar(){
-hs1.update();
-hs1.display();
-hs2.update();
-hs2.display();
-hs3.update();
-hs3.display();
+void drawScrollBar() {
+  hs1.update();
+  hs1.display();
+  hs2.update();
+  hs2.display();
+  hs3.update();
+  hs3.display();
 }
 
 boolean isMouseOver() {
-return ((mouseY > 600-35 && mouseY < 600) || (mouseY > 600-90 && mouseY < 600 - 55) || (mouseY > 600-145 && mouseY < 600 - 110));
+  return ((mouseY > 600-35 && mouseY < 600) || (mouseY > 600-90 && mouseY < 600 - 55) || (mouseY > 600-145 && mouseY < 600 - 110));
 }
 
 PImage selectHue(PImage img){
