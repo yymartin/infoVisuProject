@@ -3,6 +3,9 @@ import processing.video.*;
 Capture cam;
 PImage img, houghImg;
 HScrollbar hs1, hs2 ,hs3;
+QuadGraph qg;
+
+float[] tabCos, tabSin;
 
 int pWidth = 640;
 int pHeight = 480;
@@ -18,11 +21,11 @@ float[][] gaussian = { { 9, 12, 9 },
                        { 9, 12, 9 } };
                          
 void settings() {
-  size(640, 480, P2D);
+  size(1000, 1000, P2D);
 }
 
 void setup() {
-  
+  qg = new QuadGraph();
   hs1 = new HScrollbar(0, pHeight-35, pWidth, 35);
   hs2 = new HScrollbar(0, pHeight - 90, pWidth, 35); 
   hs3 = new HScrollbar(0, pHeight - 145, pWidth, 35);
@@ -41,75 +44,138 @@ void setup() {
     cam.start();
   }
   
-
+  phiDim = (int) (Math.PI / discretizationStepsPhi);
+  rDim = (int) (((pWidth + pHeight) * 2 + 1) / discretizationStepsR);
+  
+  tabSin = new float[phiDim];
+  tabCos = new float[phiDim];
+  float ang = 0;
+  float inverseR = 1.f / discretizationStepsR;
+  for (int accPhi = 0; accPhi < phiDim; ang += discretizationStepsPhi, accPhi++) {
+// we can also pre-multiply by (1/discretizationStepsR) since we need it in the Hough loop
+    tabSin[accPhi] = (float) (Math.sin(ang) * inverseR);
+    tabCos[accPhi] = (float) (Math.cos(ang) * inverseR);
+  }
+  for(int i = 0; i < tabSin.length; i++){
+   println("TabSin = " + tabSin[i]); 
+  }
 
 }
 
 void draw() {
-  if (cam.available() == true) {
+ /* if (cam.available() == true) {
     cam.read();
   }
   img = cam.get();
+  */
+ 
+ 
+ img = loadImage("board1.jpg");
+ selectHue(img);
+ selectSaturation(img);
+ img = convolute(img, gaussian);
+ filterBinary(img, false, 2);
+ sobel(img);
+ hough(img);
   
-  PImage finalimg = sobel(img);
-  hough(finalimg);
-  image(img, 0, 0);
-  houghLinePlot(finalimg, 6);
-  getIntersections(candidatesAsVectors);
+ image(img, 0, 0);
+ houghLinePlot(img, 6);
+   ArrayList<PVector> listRPhi = new ArrayList<PVector>();    
+  int j = 0;
+  for(int i : bestKey){
+    if(j < 6){
+    listRPhi.add(bestCandidates.get(i));
+    }
+    j++;
+  }
+  getIntersections(listRPhi);
+  qg.build(listRPhi,pWidth,pHeight);
   
-//image(filterBinary(img, true, 255*hs1.getPos()), 0, 0);
-//image(filterHue(img),0,0);
-//image(selectHue(img),0,0);
-//image(convolute(img,gaussian),0,0);
-  //PImage finalimg = selectHue(img);
-//  finalimg = convolute(finalimg,gaussian);
-//  finalimg = filterBinary(finalimg, true, 255*hs3.getPos());
- // finalimg = convolute(finalimg,gaussian);
-  //image(finalimg,0,0);
-//  image(finalimg,0,0);
+  for (int[] quad : qg.cycles) {
+  PVector l1 = listRPhi.get(quad[0]);
+  PVector l2 = listRPhi.get(quad[1]);
+  PVector l3 = listRPhi.get(quad[2]);
+  PVector l4 = listRPhi.get(quad[3]);
+    println("L1 : " + l1.x + " , " + l1.y);
+  println("L2 : " + l2.x + " , " + l2.y);
+  println("L3 : " + l3.x + " , " + l3.y);
+  println("L4 : " + l4.x + " , " + l4.y);
+
+// (intersection() is a simplified version of the
+// intersections() method you wrote last week, that simply
+// return the coordinates of the intersection between 2 lines)
+  PVector c12 = qg.intersection(l1, l2);
+  PVector c23 = qg.intersection(l2, l3);
+  PVector c34 = qg.intersection(l3, l4);
+  PVector c41 = qg.intersection(l4, l1);
+// Choose a random, semi-transparent colour
+  Random random = new Random();
+  fill(color(min(255, random.nextInt(300)),
+  min(255, random.nextInt(300)),
+  min(255, random.nextInt(300)), 50));
+  println("c12 : " + c12.x + " , " + c12.y);
+  println("c12 : " + c23.x + " , " + c23.y);
+  println("c12 : " + c34.x + " , " + c34.y);
+  println("c12 : " + c41.x + " , " + c41.y);
+  quad(c12.x,c12.y,c23.x,c23.y,c34.x,c34.y,c41.x,c41.y);
+}
+  
  //houghDisplay();
- //drawScrollBar();
+ 
+//drawScrollBar();
 }
 
 void drawScrollBar() {
   hs1.update();
   hs1.display();
-  hs2.update();
-  hs2.display();
-  hs3.update();
-  hs3.display();
+ // hs2.update();
+ // hs2.display();
+ // hs3.update();
+ // hs3.display();
 }
 
 boolean isMouseOver() {
-  return ((mouseY > 600-35 && mouseY < 600) || (mouseY > 600-90 && mouseY < 600 - 55) || (mouseY > 600-145 && mouseY < 600 - 110));
+  return ((mouseY > pHeight-35 && mouseY < pHeight) || (mouseY > pHeight-90 && mouseY < pHeight - 55) || (mouseY > pHeight-145 && mouseY < pHeight - 110));
 }
 
-PImage selectHue(PImage img){
-  PImage result = createImage(img.width, img.height, RGB); // create a new, initially transparent, ’result’ image
-  float range = Math.abs((hs1.getPos()-hs2.getPos())*255);
-  float minHue = Math.min(hs1.getPos(), hs2.getPos())*255;
+void selectHue(PImage img){
+  float range = Math.abs(119-134);
+  float minHue = Math.min(119, 134);
   
   for(int i = 0; i < img.width * img.height; i++) {
       if(hue(img.pixels[i]) > minHue && hue(img.pixels[i]) < minHue + range ){
-        result.pixels[i] = color(img.pixels[i]);
+        img.pixels[i] = color(img.pixels[i]);
       } else {
-      result.pixels[i] = color(0);
+      img.pixels[i] = color(0);
       }
   } 
-  return result;
+  img.updatePixels();
 }
 
-PImage filterHue(PImage img){
-  PImage result = createImage(img.width, img.height, RGB); // create a new, initially transparent, ’result’ image
+void selectSaturation(PImage img){
+  float range = Math.abs(70-255);
+  float minHue = Math.min(70, 255);
+  
   for(int i = 0; i < img.width * img.height; i++) {
-      result.pixels[i] = color(hue(img.pixels[i]));
+      if(saturation(img.pixels[i]) > minHue && saturation(img.pixels[i]) < minHue + range ){
+        img.pixels[i] = color(img.pixels[i]);
+      } else {
+      img.pixels[i] = color(0);
+      }
   } 
-  return result;
+  img.updatePixels();
 }
 
-PImage filterBinary(PImage img, boolean invert, float threshold){
+
+void filterHue(PImage img){
+  for(int i = 0; i < img.width * img.height; i++) {
+      img.pixels[i] = color(hue(img.pixels[i]));
+  }
+  img.updatePixels();
+}
+
+void filterBinary(PImage img, boolean invert, float threshold){
   int color1, color2;
-  PImage result = createImage(img.width, img.height, RGB); // create a new, initially transparent, ’result’ image
   if(invert){
     color1 = color(0);
     color2 = color(255);
@@ -119,18 +185,32 @@ PImage filterBinary(PImage img, boolean invert, float threshold){
   }
   for(int i = 0; i < img.width * img.height; i++) {
     if(brightness(img.pixels[i]) > threshold){
-       result.pixels[i] = color1; 
+       img.pixels[i] = color1; 
     } else {
-       result.pixels[i] = color2; 
+       img.pixels[i] = color2; 
     }
 }
-  return result;
+  img.updatePixels();
+}
+
+void selectIntensity(PImage img, float thresholdMin, float thresholdMax){
+
+  int color1 = color(0);
+  int color2 = color(255);
+  for(int i = 0; i < img.width * img.height; i++) {
+    if(brightness(img.pixels[i]) > thresholdMin && brightness(img.pixels[i]) < thresholdMax){
+       img.pixels[i] = color1; 
+    } else {
+       img.pixels[i] = color2; 
+    }
+}
+  img.updatePixels();
 }
 
 PImage convolute(PImage img, float[][] kernel) {
 float weight = 1f;
 // create a greyscale image (type: ALPHA) for output
-PImage result = createImage(img.width, img.height,ALPHA);
+PImage result = createImage(img.width, img.height, RGB);
   for(int i = 1; i < img.width-1; i++){
     for(int j = 1; j < img.height-1; j++){
         float sum = 0;
@@ -142,10 +222,10 @@ PImage result = createImage(img.width, img.height,ALPHA);
         result.pixels[j*img.width + i] = (int) (sum/weight);    
    }
   }
-return result;
+  return result;
 }
 
-PImage sobel(PImage img) {
+void sobel(PImage img) {
   float[][] hKernel = { { 0, 1, 0 },
                         { 0, 0, 0 },
                         { 0, -1, 0 } };
@@ -154,11 +234,6 @@ PImage sobel(PImage img) {
                         { 1, 0, -1},
                         { 0, 0, 0 } };
                         
-  PImage result = createImage(img.width, img.height, RGB);
-// clear the image
-    for (int i = 0; i < img.width * img.height; i++) {
-      result.pixels[i] = color(0);
-    }
   float max = 0.0f;
   float weight = 1.0f;
   float[] buffer = new float[img.width * img.height];
@@ -185,11 +260,11 @@ PImage sobel(PImage img) {
   for (int y = 2; y < img.height - 2; y++) { // Skip top and bottom edges
     for (int x = 2; x < img.width - 2; x++) { // Skip left and right
       if (buffer[y * img.width + x] > (int)(max * 0.3f)) { // 30% of the max
-        result.pixels[y * img.width + x] = color(255);
+        img.pixels[y * img.width + x] = color(255);
       } else {
-        result.pixels[y * img.width + x] = color(0);
+        img.pixels[y * img.width + x] = color(0);
       }
     }
   }
-  return result;
+  img.updatePixels();
 }
