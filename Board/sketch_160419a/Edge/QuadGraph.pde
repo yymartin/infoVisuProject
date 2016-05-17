@@ -10,7 +10,6 @@ class QuadGraph {
   int[][] graph;
 
   void build(List<PVector> lines, int width, int height) {
-
     int n = lines.size();
 
     // The maximum possible number of edges is n * (n - 1)/2
@@ -21,25 +20,11 @@ class QuadGraph {
     for (int i = 0; i < lines.size(); i++) {
       for (int j = i + 1; j < lines.size(); j++) {
         if (intersect(lines.get(i), lines.get(j), width, height)) {
-            graph[idx] = new int[]{i,j};
-          
-          // fill the graph using intersect() to check if two lines are
-          // connected in the graph.
-
-          idx++;
+            graph[idx] = new int[]{i,j};    
+            idx++;
         }
       }
-    }
-    
-    findCycles();
-    ArrayList<int[]> newCycles = new ArrayList<int[]>();
-    for(int[] c : cycles){
-       if(isConvex(lines.get(c[0]),lines.get(c[1]),lines.get(c[2]),lines.get(c[3])) 
-       && validArea(lines.get(c[0]),lines.get(c[1]),lines.get(c[2]),lines.get(c[3]),50*50, 800*800) 
-       && nonFlatQuad(lines.get(c[0]),lines.get(c[1]),lines.get(c[2]),lines.get(c[3]))){
-          newCycles.add(c);
-         }
-    }
+    }  
   }
 
   /** Returns true if polar lines 1 and 2 intersect 
@@ -66,18 +51,22 @@ class QuadGraph {
   }
   
     PVector intersection(PVector line1, PVector line2) {
+    double sin_t1 = Math.sin(line1.y);
+    double sin_t2 = Math.sin(line2.y);
+    double cos_t1 = Math.cos(line1.y);
+    double cos_t2 = Math.cos(line2.y);
+    float r1 = line1.x;
+    float r2 = line2.x;
 
-      // compute the intersection and add it to 'intersections'
-      double d = Math.cos((line2.x))*Math.sin((line1.x))
-               - Math.cos((line1.x))*Math.sin((line2.x));
-     //double d = tabCos[(int)(line2.x/discretizationStepsPhi)]*tabSin[(int)(line1.x/discretizationStepsPhi)] 
-     //          - tabCos[(int)(line1.x/discretizationStepsPhi)]*tabSin[(int)(line2.x/discretizationStepsPhi)];
-      
-     double x = (line2.y*Math.sin((line1.x)) - line1.y*Math.sin((line2.x))) / d;
-     double y = (line1.y*Math.cos((line2.x)) - line2.y*Math.cos((line1.x))) / d;
-  //    double x = (line2.y*tabSin[(int)(line1.x/discretizationStepsPhi)] - line1.y*tabSin[(int)(line2.x/discretizationStepsPhi)]) / d;
-  //    double y = (line1.y*tabCos[(int)(line2.x/discretizationStepsPhi)] - line2.y*tabCos[(int)(line1.x/discretizationStepsPhi)]) / d;
-      return new PVector((float)x,(float)y);     
+    double denom = cos_t2 * sin_t1 - cos_t1 * sin_t2;
+
+    int x = (int) ((r2 * sin_t1 - r1 * sin_t2) / denom);
+    int y = (int) ((-r2 * cos_t1 + r1 * cos_t2) / denom);
+    if (0 <= x && 0 <= y && width >= x && height >= y){
+      return new PVector((float)x,(float)y); 
+    } else {
+      return null;
+    }
   }
 
   List<int[]> findCycles() {
@@ -88,6 +77,7 @@ class QuadGraph {
         findNewCycles(new int[] {graph[i][j]});
       }
     }
+
     for (int[] cy : cycles) {
       String s = "" + cy[0];
       for (int i = 1; i < cy.length; i++) {
@@ -124,7 +114,7 @@ class QuadGraph {
             int[] inv = invert(p);
             if (isNew(p) && isNew(inv))
             {
-                cycles.add(p);
+                cycles.add(p);   
             }
           }
         }

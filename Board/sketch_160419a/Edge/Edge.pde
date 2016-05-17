@@ -7,8 +7,8 @@ QuadGraph qg;
 
 float[] tabCos, tabSin;
 
-int pWidth = 640;
-int pHeight = 480;
+int pWidth = 800;
+int pHeight = 600;
 
 float[][] kernel1 = { { 0, 0, 0 },
                       { 0, 2, 0 },
@@ -21,7 +21,7 @@ float[][] gaussian = { { 9, 12, 9 },
                        { 9, 12, 9 } };
                          
 void settings() {
-  size(1000, 1000, P2D);
+  size(pWidth, pHeight, P2D);
 }
 
 void setup() {
@@ -56,10 +56,10 @@ void setup() {
     tabSin[accPhi] = (float) (Math.sin(ang) * inverseR);
     tabCos[accPhi] = (float) (Math.cos(ang) * inverseR);
   }
-  for(int i = 0; i < tabSin.length; i++){
-   println("TabSin = " + tabSin[i]); 
+  
+  for(int i = 0; i < tabCos.length; i++){
+   println("TabCos["+i+"] : " + tabCos[i]); 
   }
-
 }
 
 void draw() {
@@ -91,16 +91,11 @@ void draw() {
   getIntersections(listRPhi);
   qg.build(listRPhi,pWidth,pHeight);
   
-  for (int[] quad : qg.cycles) {
+  for (int[] quad : qg.findCycles()) {
   PVector l1 = listRPhi.get(quad[0]);
   PVector l2 = listRPhi.get(quad[1]);
   PVector l3 = listRPhi.get(quad[2]);
   PVector l4 = listRPhi.get(quad[3]);
-    println("L1 : " + l1.x + " , " + l1.y);
-  println("L2 : " + l2.x + " , " + l2.y);
-  println("L3 : " + l3.x + " , " + l3.y);
-  println("L4 : " + l4.x + " , " + l4.y);
-
 // (intersection() is a simplified version of the
 // intersections() method you wrote last week, that simply
 // return the coordinates of the intersection between 2 lines)
@@ -108,19 +103,22 @@ void draw() {
   PVector c23 = qg.intersection(l2, l3);
   PVector c34 = qg.intersection(l3, l4);
   PVector c41 = qg.intersection(l4, l1);
+  if(c12 != null && c23 != null && c34 != null & c41 != null
+  && qg.isConvex(c12,c23,c34,c41) 
+  && qg.validArea(c12,c23,c34,c41, pWidth*pHeight, 10*10)
+  && qg.nonFlatQuad(c12,c23,c34,c41)){
 // Choose a random, semi-transparent colour
   Random random = new Random();
   fill(color(min(255, random.nextInt(300)),
   min(255, random.nextInt(300)),
   min(255, random.nextInt(300)), 50));
-  println("c12 : " + c12.x + " , " + c12.y);
-  println("c12 : " + c23.x + " , " + c23.y);
-  println("c12 : " + c34.x + " , " + c34.y);
-  println("c12 : " + c41.x + " , " + c41.y);
   quad(c12.x,c12.y,c23.x,c23.y,c34.x,c34.y,c41.x,c41.y);
+  }
+  
+  noLoop();
 }
   
- //houghDisplay();
+//houghDisplay();
  
 //drawScrollBar();
 }
