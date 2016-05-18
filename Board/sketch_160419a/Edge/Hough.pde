@@ -8,7 +8,7 @@ float discretizationStepsR = 2.5f;
 Map<Integer, PVector> bestCandidates;
 ArrayList<PVector> candidatesAsVectors;
 ArrayList<Integer> bestKey;
-int minVotes = 200;
+int minVotes = 160;
 
 void hough(PImage edgeImg) {
 
@@ -70,7 +70,6 @@ void hough(PImage edgeImg) {
         }
         if(bestCandidate) {
           // the current idx *is* a local maximum
-          //bestCandidates.add(idx);
           PVector rPhi = new PVector((accR - (rDim - 1) * 0.5f) * discretizationStepsR,accPhi*discretizationStepsPhi);
           bestCandidates.put(idx,rPhi);
         }
@@ -90,7 +89,7 @@ void houghDisplay(){
   houghImg.pixels[i] = color(min(255, accumulator[i]));
   }
 // You may want to resize the accumulator to make it easier to see:
- houghImg.resize(640, 480);
+ houghImg.resize(pWidth, pHeight);
  houghImg.updatePixels();
  image(houghImg,0,0);
 }
@@ -118,15 +117,10 @@ ArrayList<PVector> getIntersections(List<PVector> lines) {
       PVector line2 = lines.get(j);
         
       // compute the intersection and add it to 'intersections'
-     println("Correct : " + Math.cos(line2.y));
-     double d = Math.cos((line2.y))*Math.sin((line1.y))
-               - Math.cos((line1.y))*Math.sin((line2.y));
-     //double d = tabCos[Math.round(line2.y)]*tabSin[Math.round(line1.y)] 
-     //          - tabCos[Math.round(line1.y)]*tabSin[Math.round(line2.y)];
-     double x = (line2.x*Math.sin((line1.y)) - line1.x*Math.sin((line2.y))) / d;
-     double y = (line1.x*Math.cos((line2.y)) - line2.x*Math.cos((line1.y))) / d;
-      //double x = (line2.y*tabSin[(int)(line1.x/discretizationStepsPhi)] - line1.y*tabSin[(int)(line2  .x/discretizationStepsPhi)]) / d;
-      //double y = (line1.y*tabCos[(int)(line2.x/discretizationStepsPhi)] - line2.y*tabCos[(int)(line1.x/discretizationStepsPhi)]) / d;
+     double d = tabCos[Math.round(line2.y/discretizationStepsPhi)]*tabSin[Math.round(line1.y/discretizationStepsPhi)] 
+               - tabCos[Math.round(line1.y/discretizationStepsPhi)]*tabSin[Math.round(line2.y/discretizationStepsPhi)];
+     double x = (line2.x*tabSin[Math.round(line1.y/discretizationStepsPhi)] - line1.x*tabSin[Math.round(line2.y/discretizationStepsPhi)]) / d;
+     double y = (line1.x*tabCos[Math.round(line2.y/discretizationStepsPhi)] - line2.x*tabCos[Math.round(line1.y/discretizationStepsPhi)]) / d;
       
       // draw the intersection
       fill(255, 128, 0);
@@ -157,17 +151,13 @@ void houghLinePlot(PImage edgeImg, int nLines) {
     // compute the intersection of this line with the 4 borders of
     // the image
     int x0 = 0;
-    int y0 = (int) (r / Math.sin((phi)));
-    int x1 = (int) (r / Math.cos((phi)));
-    //int y0 = (int) (r / tabSin[(int)(phi/discretizationStepsPhi)]);
-    //int x1 = (int) (r / tabCos[(int)(phi/discretizationStepsPhi)]);
+    int y0 = (int) (r / tabSin[Math.round(phi/discretizationStepsPhi)]);
+    int x1 = (int) (r / tabCos[Math.round(phi/discretizationStepsPhi)]);
     int y1 = 0;
     int x2 = edgeImg.width;
-    int y2 = (int) (-Math.cos((phi)) / Math.sin((phi)) * x2 + r / Math.sin((phi)));
-    //int y2 = (int) (-tabCos[(int)(phi/discretizationStepsPhi)] / tabSin[(int)(phi/discretizationStepsPhi)] * x2 + r / tabSin[(int)(phi/discretizationStepsPhi)]);
+    int y2 = (int) (-tabCos[Math.round(phi/discretizationStepsPhi)] / tabSin[Math.round(phi/discretizationStepsPhi)] * x2 + r / tabSin[Math.round(phi/discretizationStepsPhi)]);
     int y3 = edgeImg.width;
-    int x3 = (int) (-(y3 - r / Math.sin((phi))) * (Math.sin((phi)) / Math.cos((phi))));
-    //int x3 = (int) (-(y3 - r / tabSin[(int)(phi/discretizationStepsPhi)]) * (tabSin[(int)(phi/discretizationStepsPhi)] / tabCos[(int)(phi/discretizationStepsPhi)]));
+    int x3 = (int) (-(y3 - r / tabSin[Math.round(phi/discretizationStepsPhi)]) * (tabSin[Math.round(phi/discretizationStepsPhi)] / tabCos[Math.round(phi/discretizationStepsPhi)]));
     // Finally, plot the lines
     stroke(204,102,0);
     if (y0 > 0) {

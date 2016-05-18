@@ -28,7 +28,7 @@ void setup() {
   qg = new QuadGraph();
   hs1 = new HScrollbar(0, pHeight-35, pWidth, 35);
   hs2 = new HScrollbar(0, pHeight - 90, pWidth, 35); 
-  hs3 = new HScrollbar(0, pHeight - 145, pWidth, 35);
+  //hs3 = new HScrollbar(0, pHeight - 145, pWidth, 35);
   
   String[] cameras = Capture.list();
   if (cameras.length == 0) {
@@ -50,15 +50,11 @@ void setup() {
   tabSin = new float[phiDim];
   tabCos = new float[phiDim];
   float ang = 0;
-  float inverseR = 1.f / discretizationStepsR;
+// float inverseR = 1.f / discretizationStepsR;
   for (int accPhi = 0; accPhi < phiDim; ang += discretizationStepsPhi, accPhi++) {
 // we can also pre-multiply by (1/discretizationStepsR) since we need it in the Hough loop
-    tabSin[accPhi] = (float) (Math.sin(ang) * inverseR);
-    tabCos[accPhi] = (float) (Math.cos(ang) * inverseR);
-  }
-  
-  for(int i = 0; i < tabCos.length; i++){
-   println("TabCos["+i+"] : " + tabCos[i]); 
+    tabSin[accPhi] = (float) (Math.sin(ang));
+    tabCos[accPhi] = (float) (Math.cos(ang));
   }
 }
 
@@ -70,18 +66,17 @@ void draw() {
   */
  
  
- img = loadImage("board1.jpg");
- selectHue(img);
- selectSaturation(img);
+ img = loadImage("board2.jpg");
+ selectHBS(img);
  img = convolute(img, gaussian);
- filterBinary(img, false, 2);
+ selectIntensity(img);
  sobel(img);
  hough(img);
   
  image(img, 0, 0);
  houghLinePlot(img, 6);
-   ArrayList<PVector> listRPhi = new ArrayList<PVector>();    
-  int j = 0;
+ ArrayList<PVector> listRPhi = new ArrayList<PVector>();    
+ int j = 0;
   for(int i : bestKey){
     if(j < 6){
     listRPhi.add(bestCandidates.get(i));
@@ -103,19 +98,19 @@ void draw() {
   PVector c23 = qg.intersection(l2, l3);
   PVector c34 = qg.intersection(l3, l4);
   PVector c41 = qg.intersection(l4, l1);
+  
   if(c12 != null && c23 != null && c34 != null & c41 != null
   && qg.isConvex(c12,c23,c34,c41) 
   && qg.validArea(c12,c23,c34,c41, pWidth*pHeight, 10*10)
   && qg.nonFlatQuad(c12,c23,c34,c41)){
+    
 // Choose a random, semi-transparent colour
   Random random = new Random();
   fill(color(min(255, random.nextInt(300)),
   min(255, random.nextInt(300)),
   min(255, random.nextInt(300)), 50));
   quad(c12.x,c12.y,c23.x,c23.y,c34.x,c34.y,c41.x,c41.y);
-  }
-  
-  noLoop();
+  }  
 }
   
 //houghDisplay();
@@ -126,82 +121,59 @@ void draw() {
 void drawScrollBar() {
   hs1.update();
   hs1.display();
- // hs2.update();
- // hs2.display();
- // hs3.update();
- // hs3.display();
+  hs2.update();
+  hs2.display();
+  //hs3.update();
+  //hs3.display();
 }
 
 boolean isMouseOver() {
   return ((mouseY > pHeight-35 && mouseY < pHeight) || (mouseY > pHeight-90 && mouseY < pHeight - 55) || (mouseY > pHeight-145 && mouseY < pHeight - 110));
 }
 
-void selectHue(PImage img){
-  float range = Math.abs(119-134);
-  float minHue = Math.min(119, 134);
-  
-  for(int i = 0; i < img.width * img.height; i++) {
-      if(hue(img.pixels[i]) > minHue && hue(img.pixels[i]) < minHue + range ){
-        img.pixels[i] = color(img.pixels[i]);
+void selectHBS(PImage img){
+    
+    float thresholdHue1 = 88;
+    float thresholdHue2 = 139; //137
+    
+    float thresholdBrightness1 = 30; 
+    float thresholdBrightness2 = 180; 
+    
+    float thresholdSaturation1 = 70; //60 --> 70?
+    float thresholdSaturation2 = 255;
+   
+    for (int i = 0; i < img.width * img.height; i++) {
+      
+      float hue = hue(img.pixels[i]);
+      float brightness = brightness(img.pixels[i]);
+      float saturation = saturation(img.pixels[i]);
+      
+      if(hue < thresholdHue1 || hue > thresholdHue2
+          || brightness < thresholdBrightness1 || brightness > thresholdBrightness2
+          || saturation < thresholdSaturation1 || saturation > thresholdSaturation2) {
+        
+        img.pixels[i] = color(0);
       } else {
-      img.pixels[i] = color(0);
+        img.pixels[i] = color(255);
       }
-  } 
-  img.updatePixels();
-}
-
-void selectSaturation(PImage img){
-  float range = Math.abs(70-255);
-  float minHue = Math.min(70, 255);
+    }
+    img.updatePixels();
+  }
   
-  for(int i = 0; i < img.width * img.height; i++) {
-      if(saturation(img.pixels[i]) > minHue && saturation(img.pixels[i]) < minHue + range ){
-        img.pixels[i] = color(img.pixels[i]);
+  void selectIntensity(PImage img){
+    
+    float threshold = 128;
+    
+    for (int i = 0; i < img.width * img.height; i++) {
+      
+      float brightness = brightness(img.pixels[i]);
+      
+      if(brightness < threshold) {
+        img.pixels[i] = color(0);
       } else {
-      img.pixels[i] = color(0);
+        img.pixels[i] = color(255);
       }
-  } 
-  img.updatePixels();
-}
-
-
-void filterHue(PImage img){
-  for(int i = 0; i < img.width * img.height; i++) {
-      img.pixels[i] = color(hue(img.pixels[i]));
-  }
-  img.updatePixels();
-}
-
-void filterBinary(PImage img, boolean invert, float threshold){
-  int color1, color2;
-  if(invert){
-    color1 = color(0);
-    color2 = color(255);
-  } else {
-    color1 = color(255);
-    color2 = color(0);
-  }
-  for(int i = 0; i < img.width * img.height; i++) {
-    if(brightness(img.pixels[i]) > threshold){
-       img.pixels[i] = color1; 
-    } else {
-       img.pixels[i] = color2; 
     }
-}
-  img.updatePixels();
-}
-
-void selectIntensity(PImage img, float thresholdMin, float thresholdMax){
-
-  int color1 = color(0);
-  int color2 = color(255);
-  for(int i = 0; i < img.width * img.height; i++) {
-    if(brightness(img.pixels[i]) > thresholdMin && brightness(img.pixels[i]) < thresholdMax){
-       img.pixels[i] = color1; 
-    } else {
-       img.pixels[i] = color2; 
-    }
-}
   img.updatePixels();
 }
 
