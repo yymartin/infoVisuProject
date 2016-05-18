@@ -8,7 +8,7 @@ float discretizationStepsR = 2.5f;
 Map<Integer, PVector> bestCandidates;
 ArrayList<PVector> candidatesAsVectors;
 ArrayList<Integer> bestKey;
-int minVotes = 160;
+int minVotes = 100;
 
 void hough(PImage edgeImg) {
 
@@ -29,7 +29,6 @@ void hough(PImage edgeImg) {
          if (brightness(edgeImg.pixels[y * edgeImg.width + x]) != 0) {
          for(float phi = 0; phi < Math.PI; phi+=discretizationStepsPhi){
               double r = x*Math.cos((phi)) + y*Math.sin((phi));
-              //double r = x*tabCos[(int)(phi/discretizationStepsPhi)] + y*tabSin[(int)(phi/discretizationStepsPhi)];
                  int rIndex = (int) Math.round(r / discretizationStepsR);
                   rIndex += (rDim - 1)/2;
                   int phiIndex = (int) Math.round(phi / discretizationStepsPhi); 
@@ -89,9 +88,9 @@ void houghDisplay(){
   houghImg.pixels[i] = color(min(255, accumulator[i]));
   }
 // You may want to resize the accumulator to make it easier to see:
- houghImg.resize(pWidth, pHeight);
+ houghImg.resize(400, 300);
  houghImg.updatePixels();
- image(houghImg,0,0);
+ image(houghImg,400,0);
 }
 
 PVector getCoordinatesFromIndex(int index) {
@@ -124,7 +123,7 @@ ArrayList<PVector> getIntersections(List<PVector> lines) {
       
       // draw the intersection
       fill(255, 128, 0);
-      ellipse((float)x, (float)y, 10, 10);
+      ellipse((float)x, (float)y, 5, 5);
     }
   }
 

@@ -1,14 +1,14 @@
 import processing.video.*;
 
-Capture cam;
-PImage img, houghImg;
+//Capture cam;
+PImage img, img1, img2, img3, houghImg;
 HScrollbar hs1, hs2 ,hs3;
 QuadGraph qg;
 
 float[] tabCos, tabSin;
 
-int pWidth = 800;
-int pHeight = 600;
+int pWidth = 1200;
+int pHeight = 300;
 
 float[][] kernel1 = { { 0, 0, 0 },
                       { 0, 2, 0 },
@@ -26,11 +26,11 @@ void settings() {
 
 void setup() {
   qg = new QuadGraph();
-  hs1 = new HScrollbar(0, pHeight-35, pWidth, 35);
-  hs2 = new HScrollbar(0, pHeight - 90, pWidth, 35); 
+  //hs1 = new HScrollbar(0, pHeight-35, pWidth, 35);
+  //hs2 = new HScrollbar(0, pHeight - 90, pWidth, 35); 
   //hs3 = new HScrollbar(0, pHeight - 145, pWidth, 35);
   
-  String[] cameras = Capture.list();
+/*  String[] cameras = Capture.list();
   if (cameras.length == 0) {
     println("There are no cameras available for capture.");
     exit();
@@ -42,7 +42,7 @@ void setup() {
     }
     cam = new Capture(this, cameras[0]);
     cam.start();
-  }
+  } */
   
   phiDim = (int) (Math.PI / discretizationStepsPhi);
   rDim = (int) (((pWidth + pHeight) * 2 + 1) / discretizationStepsR);
@@ -64,58 +64,75 @@ void draw() {
   }
   img = cam.get();
   */
- 
- 
- img = loadImage("board2.jpg");
- selectHBS(img);
- img = convolute(img, gaussian);
- selectIntensity(img);
- sobel(img);
- hough(img);
   
+//****************
+// Image selection 
+//****************
+
+// img = loadImage("board1.jpg");
+// img = loadImage("board2.jpg");
+// img = loadImage("board3.jpg");
+ img = loadImage("board4.jpg");
+
+ img.resize(400,300);
+ img1 = img.copy();
+ 
  image(img, 0, 0);
- houghLinePlot(img, 6);
+ 
+ selectHBS(img1);
+ img1 = convolute(img1, gaussian);
+ selectIntensity(img1);
+ sobel(img1);
+ hough(img1);
+ houghLinePlot(img1, 4);
+ 
  ArrayList<PVector> listRPhi = new ArrayList<PVector>();    
  int j = 0;
-  for(int i : bestKey){
-    if(j < 6){
-    listRPhi.add(bestCandidates.get(i));
-    }
+   for(int i : bestKey){
+     if(j < 4){
+        listRPhi.add(bestCandidates.get(i));
+      }
     j++;
   }
   getIntersections(listRPhi);
+  
+  houghDisplay(); 
+  image(img1, 800,0);
+  
+//displayQuad(listRPhi);
+//drawScrollBar();
+}
+
+void displayQuad(ArrayList<PVector> listRPhi){
+  
   qg.build(listRPhi,pWidth,pHeight);
   
   for (int[] quad : qg.findCycles()) {
-  PVector l1 = listRPhi.get(quad[0]);
-  PVector l2 = listRPhi.get(quad[1]);
-  PVector l3 = listRPhi.get(quad[2]);
-  PVector l4 = listRPhi.get(quad[3]);
+    PVector l1 = listRPhi.get(quad[0]);
+    PVector l2 = listRPhi.get(quad[1]);
+    PVector l3 = listRPhi.get(quad[2]);
+    PVector l4 = listRPhi.get(quad[3]);
 // (intersection() is a simplified version of the
 // intersections() method you wrote last week, that simply
 // return the coordinates of the intersection between 2 lines)
-  PVector c12 = qg.intersection(l1, l2);
-  PVector c23 = qg.intersection(l2, l3);
-  PVector c34 = qg.intersection(l3, l4);
-  PVector c41 = qg.intersection(l4, l1);
+    PVector c12 = qg.intersection(l1, l2);
+    PVector c23 = qg.intersection(l2, l3);
+    PVector c34 = qg.intersection(l3, l4);
+    PVector c41 = qg.intersection(l4, l1);
   
-  if(c12 != null && c23 != null && c34 != null & c41 != null
-  && qg.isConvex(c12,c23,c34,c41) 
-  && qg.validArea(c12,c23,c34,c41, pWidth*pHeight, 10*10)
-  && qg.nonFlatQuad(c12,c23,c34,c41)){
+    if(c12 != null && c23 != null && c34 != null & c41 != null
+       && qg.isConvex(c12,c23,c34,c41) 
+       && qg.validArea(c12,c23,c34,c41, 1000000, 10000)
+       && qg.nonFlatQuad(c12,c23,c34,c41)){
     
 // Choose a random, semi-transparent colour
-  Random random = new Random();
-  fill(color(min(255, random.nextInt(300)),
-  min(255, random.nextInt(300)),
-  min(255, random.nextInt(300)), 50));
-  quad(c12.x,c12.y,c23.x,c23.y,c34.x,c34.y,c41.x,c41.y);
-  }  
-}
-  
-//houghDisplay();
- 
-//drawScrollBar();
+    Random random = new Random();
+    fill(color(min(255, random.nextInt(300)),
+    min(255, random.nextInt(300)),
+    min(255, random.nextInt(300)), 50));
+    quad(c12.x,c12.y,c23.x,c23.y,c34.x,c34.y,c41.x,c41.y);
+    }  
+  } 
 }
 
 void drawScrollBar() {
@@ -123,8 +140,8 @@ void drawScrollBar() {
   hs1.display();
   hs2.update();
   hs2.display();
-  //hs3.update();
-  //hs3.display();
+  hs3.update();
+  hs3.display();
 }
 
 boolean isMouseOver() {
