@@ -1,6 +1,6 @@
 import processing.video.*;
 
-//Capture cam;
+Capture cam;
 PImage img, img1, img2, img3, houghImg;
 HScrollbar hs1, hs2 ,hs3;
 QuadGraph qg;
@@ -30,7 +30,7 @@ void setup() {
   //hs2 = new HScrollbar(0, pHeight - 90, pWidth, 35); 
   //hs3 = new HScrollbar(0, pHeight - 145, pWidth, 35);
   
-/*  String[] cameras = Capture.list();
+  String[] cameras = Capture.list();
   if (cameras.length == 0) {
     println("There are no cameras available for capture.");
     exit();
@@ -43,7 +43,7 @@ void setup() {
     cam = new Capture(this, cameras[0]);
     cam.start();
   } 
-  */
+  
   
   phiDim = (int) (Math.PI / discretizationStepsPhi);
   rDim = (int) (((pWidth + pHeight) * 2 + 1) / discretizationStepsR);
@@ -60,12 +60,12 @@ void setup() {
 }
 
 void draw() {
-/*  if (cam.available() == true) {
+  /*if (cam.available() == true) {
     cam.read();
   }
-  img = cam.get();
+  img = cam.get();*/
   
-  */
+  
  
   
   
@@ -73,10 +73,10 @@ void draw() {
 // Image selection 
 //****************
 
-// img = loadImage("board1.jpg");
+ img = loadImage("board1.jpg");
 //img = loadImage("board2.jpg");
 //img = loadImage("board3.jpg");
- img = loadImage("board4.jpg");
+// img = loadImage("board4.jpg");
 
  img.resize(400,300);
  img1 = img.copy();

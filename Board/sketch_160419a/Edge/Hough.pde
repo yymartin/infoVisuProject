@@ -6,14 +6,12 @@ int rDim;
 float discretizationStepsPhi = 0.06f;
 float discretizationStepsR = 2.5f;
 Map<Integer, PVector> bestCandidates;
-ArrayList<PVector> candidatesAsVectors;
 ArrayList<Integer> bestKey;
 int minVotes = 100;
 
 void hough(PImage edgeImg) {
 
   bestCandidates = new HashMap<Integer,PVector>();
-  candidatesAsVectors = new ArrayList<PVector>();
 
   // dimensions of the accumulator
   houghImg = createImage(rDim + 2, phiDim + 2, RGB);
@@ -78,9 +76,7 @@ void hough(PImage edgeImg) {
   
   bestKey = new ArrayList<Integer>(bestCandidates.keySet());
   Collections.sort(bestKey, new HoughComparator(accumulator));
-  for (int i : bestKey) {
-    candidatesAsVectors.add(getCoordinatesFromIndex(i));
-  }
+
 }
 
 void houghDisplay(){
