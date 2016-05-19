@@ -71,7 +71,7 @@ void hough(PImage edgeImg) {
           // the current idx *is* a local maximum
           PVector rPhi = new PVector((accR - (rDim - 1) * 0.5f) * discretizationStepsR,accPhi*discretizationStepsPhi);
           bestCandidates.put(idx,rPhi);
-        }
+        }    
       }
     }
   }

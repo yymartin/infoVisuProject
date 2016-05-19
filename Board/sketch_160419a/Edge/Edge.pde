@@ -42,7 +42,8 @@ void setup() {
     }
     cam = new Capture(this, cameras[0]);
     cam.start();
-  } */
+  } 
+  */
   
   phiDim = (int) (Math.PI / discretizationStepsPhi);
   rDim = (int) (((pWidth + pHeight) * 2 + 1) / discretizationStepsR);
@@ -59,24 +60,26 @@ void setup() {
 }
 
 void draw() {
- /* if (cam.available() == true) {
+/*  if (cam.available() == true) {
     cam.read();
   }
   img = cam.get();
+  
   */
+ 
+  
   
 //****************
 // Image selection 
 //****************
 
 // img = loadImage("board1.jpg");
-// img = loadImage("board2.jpg");
-// img = loadImage("board3.jpg");
+//img = loadImage("board2.jpg");
+//img = loadImage("board3.jpg");
  img = loadImage("board4.jpg");
 
  img.resize(400,300);
  img1 = img.copy();
- 
  image(img, 0, 0);
  
  selectHBS(img1);
@@ -86,7 +89,7 @@ void draw() {
  hough(img1);
  houghLinePlot(img1, 4);
  
- ArrayList<PVector> listRPhi = new ArrayList<PVector>();    
+ArrayList<PVector> listRPhi = new ArrayList<PVector>();    
  int j = 0;
    for(int i : bestKey){
      if(j < 4){
@@ -95,11 +98,12 @@ void draw() {
     j++;
   }
   getIntersections(listRPhi);
+
   
   houghDisplay(); 
   image(img1, 800,0);
   
-//displayQuad(listRPhi);
+  displayQuad(listRPhi);
 //drawScrollBar();
 }
 
