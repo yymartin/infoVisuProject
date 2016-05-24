@@ -1,12 +1,15 @@
 class Cylinder {
  float posX;
  float posY;
+ 
+ float size = 25;
+ float cylinderHeight = 10;
+ 
+ int cylinderResolution = 40;
+ 
  PShape openCylinder;
  PShape closeBottom;
  PShape closeTop;
- float size = 25;
- float cylinderHeight = 50;
- int cylinderResolution = 40;
 
 Cylinder(float posX, float posY){
   
@@ -57,10 +60,12 @@ Cylinder(float posX, float posY){
 void drawCylinder() {
   pushMatrix();
   translate(posX, -cylinderHeight, posY);
-  rotateX(-PI/2);
-  shape(openCylinder);
-  shape(closeTop);
-  shape(closeBottom);
+  rotateZ(-PI);
+//  rotateX(-PI/2);
+//  shape(openCylinder);
+//  shape(closeTop);
+//  shape(closeBottom);
+  shape(pokemon);
   popMatrix();
 }
 }

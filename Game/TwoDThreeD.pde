@@ -170,7 +170,7 @@ class TwoDThreeD {
     rot.z = (float)Math.atan2(mat[1][0]/Math.cos(rot.y), mat[0][0]/Math.cos(rot.y));
 
     return rot;
-  }
+  } 
   
     List<PVector> sortCorners(List<PVector> quad) {
 

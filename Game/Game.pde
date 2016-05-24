@@ -21,6 +21,10 @@ PGraphics score;
 PGraphics barChart;
 PGraphics scroll;
 
+PShape pokemon;
+
+ImageProcessing imgproc;
+
 HScrollbar hs;
 
 Mover mover = new Mover();
@@ -31,14 +35,22 @@ void settings() {
 
 void setup(){ 
  hs = new HScrollbar(80+2*topViewSize, windowHeight-40, 300, 20);
+ 
  for (int i = 0; i < nbCol; i++) {
    tabScore.add(0.0); 
  }
+ 
+ pokemon = loadShape("pokemon.obj");
+ 
  bottomRectangle = createGraphics(windowWidth, 200, P2D);
  topView = createGraphics(topViewSize,topViewSize, P2D);
  score = createGraphics(topViewSize+700, topViewSize+700, P2D);
  barChart = createGraphics(barChartWidth, topViewSize-50, P2D);
  scroll = createGraphics(barChartWidth/2, 50, P2D);
+ 
+ imgproc = new ImageProcessing();
+ String []args = {"Image processing window"};
+ PApplet.runSketch(args, imgproc);
 }
 
 void draw() {
@@ -72,12 +84,6 @@ void drawBarChart(){
  barChart.stroke(0);
  barChart.rect(0,0,barChartWidth-1, topViewSize-51);
  int j = 0;
- //for(int i = (int)(tabScore.size()-nbCol*hs.getPos()); i < tabScore.size(); i++){
- //   barChart.fill(0);
- //   barChart.stroke(255);
- //   barChart.rect(j*barChartWidth/(nbCol*hs.getPos()),topViewSize-52,barChartWidth/(nbCol*hs.getPos()), -(6.0*tabScore.get(i))/(7.0*maxScore)*(topViewSize-51));  
- //   j++;
- //}
  barChart.fill(0);
  barChart.stroke(255);
  float i = tabScore.size()-1;
@@ -116,6 +122,12 @@ void drawGame() {
   pushMatrix();
   background(255, 255, 255);
   translate(windowWidth/2, 2*windowHeight/5, 0);
+  PVector rot = imgproc.getRotation();
+  if(rot != null){
+      dragX = rot.x;
+      dragZ = rot.y;
+  }
+  
   rotateX(dragX);
   rotateZ(dragZ);
   
