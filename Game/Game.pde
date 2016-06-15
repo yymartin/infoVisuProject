@@ -40,7 +40,7 @@ void setup(){
    tabScore.add(0.0); 
  }
  
- pokemon = loadShape("pokemon.obj");
+ pokemon = loadShape("test.obj");
  
  bottomRectangle = createGraphics(windowWidth, 200, P2D);
  topView = createGraphics(topViewSize,topViewSize, P2D);
