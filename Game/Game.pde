@@ -80,7 +80,7 @@ scroll.endDraw();
 
 void drawBarChart(){
  barChart.beginDraw();
- barChart.fill(255);
+ barChart.fill(255,255,204);
  barChart.stroke(0);
  barChart.rect(0,0,barChartWidth-1, topViewSize-51);
  int j = 0;
@@ -88,6 +88,7 @@ void drawBarChart(){
  barChart.stroke(255);
  float i = tabScore.size()-1;
  while(i >= tabScore.size()-nbCol*hs.getPos()-1){
+   barChart.fill(0,204,102);
    barChart.rect(barChartWidth - j*barChartWidth/(nbCol*hs.getPos()),topViewSize-52, -(barChartWidth/(nbCol*hs.getPos())-2), -(6.0*tabScore.get((int)i))/(7.0*maxScore)*(topViewSize-51));  
    j++;
    i--;
@@ -97,13 +98,13 @@ void drawBarChart(){
 
 void drawTopView(){
   topView.beginDraw();
-  background(255,255,255);
+  background(255,255,255); //??
   topView.fill(127);
   topView.pushMatrix();
-  topView.fill(120);
+  topView.fill(0,204,102);
   topView.rect(0, 0, largeur*factor, largeur*factor);
   topView.ellipse((mover.location.x+largeur/2)*factor, (mover.location.y+largeur/2)*factor, diametre*2*factor, diametre*2*factor);
-  topView.fill(0);
+  topView.fill(255,51,51);
   for(Cylinder c : tabCyl){
     topView.ellipse((c.posX+largeur/2)*factor,(c.posY+largeur/2)*factor,(c.size)*2*factor, (c.size)*2*factor);
   }
@@ -114,13 +115,14 @@ void drawTopView(){
 
 void drawBottomRectangle(){
    bottomRectangle.beginDraw();
-   bottomRectangle.background(255,255,102);
+   bottomRectangle.background(255,51,51);
+   text("Hello World", 0, 0);
    bottomRectangle.endDraw();
 }
 
 void drawGame() {
   pushMatrix();
-  background(255, 255, 255);
+  background(153, 204, 255);
   translate(windowWidth/2, 2*windowHeight/5, 0);
   PVector rot = imgproc.getRotation();
   if(rot != null){
@@ -131,8 +133,8 @@ void drawGame() {
   rotateX(dragX);
   rotateZ(dragZ);
   
-  fill(51, 153, 255);
-  stroke(0, 102, 204);
+  fill(0, 204, 102);
+  stroke(0, 153, 76);
   box(longueur, hauteur, largeur);
 
   for (Cylinder c : tabCyl) {
@@ -149,22 +151,23 @@ void drawGame() {
 void drawScore(){
   score.beginDraw();
   score.rect(0,0, topViewSize+50, topViewSize);
-  fill(120);
+  score.fill(255,255,204);
   pushMatrix();
   translate(30, largeur + 125);
-  textSize(15);
+  textSize(18);
+  fill(0);
   text("Total Score : " + tabScore.get(tabScore.size()-1) + "\n\nVelocity : " + mover.velocity.mag() + "\n\nLast Score : " + tabScore.get(tabScore.size()-2), topViewSize , topViewSize);
   popMatrix();
   score.endDraw();
 }
 
 void drawShift() {
-  background(255, 255, 255);
+  background(204, 153, 255);
   pushMatrix();
   translate(windowWidth/2, windowHeight/2, 0);
   rotateX(-PI/2);
-  noFill();
-  stroke(0);
+  fill(0,204,102);
+  stroke(0,102,51);
   box(longueur, hauteur, largeur);
   mover.display();
   for (Cylinder c : tabCyl) {

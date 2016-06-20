@@ -27,7 +27,7 @@ class ImageProcessing extends PApplet {
   
   QuadGraph qg;
   TwoDThreeD td;
-  Capture cam;
+  Movie cam;
 
   Map<Integer, PVector> bestCandidates;
   ArrayList<Integer> bestKey;
@@ -42,19 +42,8 @@ class ImageProcessing extends PApplet {
     
   void setup(){  
     qg = new QuadGraph();  
-    String[] cameras = Capture.list();
-   
-    if (cameras.length == 0) {
-      println("There are no cameras available for capture.");
-      exit();
-    } else {
-      println("Available cameras:");
-      for (int i = 0; i < cameras.length; i++) {
-        println(cameras[i]);
-      }
-      cam = new Capture(this, cameras[0]);
-      cam.start();
-  } 
+    cam = new Movie(this, "testvideo.mp4");
+    cam.loop();
  
   phiDim = (int) (Math.PI / discretizationStepsPhi);
   rDim = (int) (((pWidth + pHeight) * 2 + 1) / discretizationStepsR);

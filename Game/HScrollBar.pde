@@ -68,7 +68,7 @@ float constrain(float val, float minVal, float maxVal) {
 */
 void display() {
   noStroke();
-  fill(204);
+  scroll.fill(255,255,204);
   scroll.rect(0, 0, barWidth, barHeight);
   
   if (mouseOver || locked) {
@@ -76,7 +76,7 @@ void display() {
   } else {
   fill(102, 102, 102);
   }
-  
+  scroll.fill(0,204,102);
   scroll.rect(sliderPosition-xPosition, 0, barHeight, barHeight);
 }
 /**
