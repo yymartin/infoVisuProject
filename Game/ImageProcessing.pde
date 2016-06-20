@@ -4,8 +4,8 @@ import java.util.*;
 class ImageProcessing extends PApplet {
   int phiDim;
   int rDim;  
-  int pWidth = 1280;
-  int pHeight = 720;
+  int pWidth = 640;
+  int pHeight = 480;
   int minVotes = 100;
   
   int[] accumulator;
@@ -27,7 +27,6 @@ class ImageProcessing extends PApplet {
   
   QuadGraph qg;
   TwoDThreeD td;
-  Movie cam;
 
   Map<Integer, PVector> bestCandidates;
   ArrayList<Integer> bestKey;
@@ -42,8 +41,6 @@ class ImageProcessing extends PApplet {
     
   void setup(){  
     qg = new QuadGraph();  
-    cam = new Movie(this, "testvideo.mp4");
-    cam.loop();
  
   phiDim = (int) (Math.PI / discretizationStepsPhi);
   rDim = (int) (((pWidth + pHeight) * 2 + 1) / discretizationStepsR);
@@ -78,12 +75,12 @@ class ImageProcessing extends PApplet {
     hough(img1);
     houghLinePlot(img1, 6);
     
-    image(img1,0,0);
+    image(img,0,0);
  
     ArrayList<PVector> listRPhi = new ArrayList<PVector>();    
     int j = 0;
     for(int i : bestKey){
-      if(j < 6){
+      if(j < 4){
         listRPhi.add(bestCandidates.get(i));
       }
       j++;
@@ -122,7 +119,8 @@ class ImageProcessing extends PApplet {
     if(c12 != null && c23 != null && c34 != null & c41 != null
        && qg.isConvex(c12,c23,c34,c41) 
        && qg.validArea(c12,c23,c34,c41, pWidth*pHeight, 100*100)
-       && qg.nonFlatQuad(c12,c23,c34,c41)){
+      // && qg.nonFlatQuad(c12,c23,c34,c41)){
+       ){
     
 // Choose a random, semi-transparent colour
     Random random = new Random();

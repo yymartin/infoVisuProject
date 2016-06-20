@@ -43,7 +43,7 @@ void update(){
   }
   
   if (locked) {
-      newSliderPosition = constrain(mouseX - barHeight/2, sliderPositionMin, sliderPositionMax);
+      newSliderPosition = constrain(mouseX - barHeight/2, sliderPositionMin, sliderPositionMax-1);
   }
   
   if (abs(newSliderPosition - sliderPosition) > 1) {

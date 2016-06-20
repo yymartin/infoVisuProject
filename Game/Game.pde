@@ -25,6 +25,8 @@ PShape pokemon;
 
 ImageProcessing imgproc;
 
+Movie cam;
+
 HScrollbar hs;
 
 Mover mover = new Mover();
@@ -34,6 +36,8 @@ void settings() {
 }
 
 void setup(){ 
+   cam = new Movie(this, "testvideo.mp4");
+   cam.loop();
  hs = new HScrollbar(80+2*topViewSize, windowHeight-40, 300, 20);
  
  for (int i = 0; i < nbCol; i++) {
@@ -103,6 +107,7 @@ void drawTopView(){
   topView.pushMatrix();
   topView.fill(0,204,102);
   topView.rect(0, 0, largeur*factor, largeur*factor);
+  topView.fill(255,255,204);
   topView.ellipse((mover.location.x+largeur/2)*factor, (mover.location.y+largeur/2)*factor, diametre*2*factor, diametre*2*factor);
   topView.fill(255,51,51);
   for(Cylinder c : tabCyl){
