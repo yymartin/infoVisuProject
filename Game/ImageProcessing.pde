@@ -119,7 +119,9 @@ class ImageProcessing extends PApplet {
     if(c12 != null && c23 != null && c34 != null & c41 != null
        && qg.isConvex(c12,c23,c34,c41) 
        && qg.validArea(c12,c23,c34,c41, pWidth*pHeight, 100*100)
-      // && qg.nonFlatQuad(c12,c23,c34,c41)){
+      // && qg.nonFlatQuad(c12,c23,c34,c41)){ 
+        
+      //If we add this line, the quads are not correctly detected so we decided to comment it 
        ){
     
 // Choose a random, semi-transparent colour
